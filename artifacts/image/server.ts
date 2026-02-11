@@ -39,6 +39,6 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
     return draftContent;
   },
   onUpdateDocument: async ({ document, description, dataStream }) => {
-    return document.content;
+    return document.content ?? '';
   },
 });
