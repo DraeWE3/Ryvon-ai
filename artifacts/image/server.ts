@@ -23,7 +23,7 @@ export const imageDocumentHandler = createDocumentHandler<"image">({
       if (type === "object") {
         const { object } = delta;
         const { description } = object;
-
+  
         if (description) {
           dataStream.write({
             type: "data-imageDelta",

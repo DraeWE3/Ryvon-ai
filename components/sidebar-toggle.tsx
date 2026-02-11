@@ -12,13 +12,17 @@ import { Button } from "./ui/button";
 export function SidebarToggle({
   className,
 }: ComponentProps<typeof SidebarTrigger>) {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, open, openMobile, isMobile } = useSidebar();
+
+  if (isMobile ? openMobile : open) {
+    return null;
+  }
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          className={cn("h-8 px-2 md:h-fit md:px-2 border-none bg-transparent hover:bg-white/5", className)}
+          className={cn("h-8 px-2 h-fit border-none bg-transparent hover:bg-white/5 block", className)}
           data-testid="sidebar-toggle-button"
           onClick={toggleSidebar}
           variant="outline"

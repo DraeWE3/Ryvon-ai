@@ -16,7 +16,7 @@ export default function Page() {
   const [email, setEmail] = useState("");
   const [isSuccessful, setIsSuccessful] = useState(false);
 
-  const [state, formAction] = useActionState<RegisterActionState, FormData>(
+  const [state, formAction, isPending] = useActionState<RegisterActionState, FormData>(
     register,
     {
       status: "idle",
@@ -58,7 +58,7 @@ export default function Page() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            src="/img-log/Ryvon-wordmark.svg" 
+            src="/img/Ryvon-wordmark.svg" 
             alt="Ryvon AI" 
             className="auth-logo" 
           />
@@ -137,8 +137,8 @@ export default function Page() {
                 </div>
               </div>
 
-              <button type="submit" className="login-button" disabled={isSuccessful}>
-                {isSuccessful ? "Creating account..." : "Sign Up"}
+              <button type="submit" className="login-button" disabled={isPending || isSuccessful}>
+                {isPending || isSuccessful ? "Signing up..." : "Sign Up"}
               </button>
             </motion.form>
           </motion.div>

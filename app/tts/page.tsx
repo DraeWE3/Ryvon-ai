@@ -14,6 +14,7 @@ import playBtnBg from '../../artifacts/image/play-btn-bg.png';
 import downloadBg from '../../artifacts/image/download-bg.png';
 import downloadIcon from '../../artifacts/image/download-icon.svg';
 import { Play, Pause, Menu, X } from 'lucide-react';
+import { SidebarToggle } from '@/components/sidebar-toggle';
 
 export default function TextToSpeechPage() {
   const [mounted, setMounted] = useState(false);
@@ -273,16 +274,20 @@ export default function TextToSpeechPage() {
     <>
       <div className="tts-page-container">
       <div className="tts-main-content chat">
-        <div className='chat-top'>
-          <div className="btn2 btn desktop-only"><p>RyvonAI v1.0</p><img src="/img/down.svg" alt="" /></div>
-          
-          <div className="mobile-menu-btn" onClick={() => setIsMenuOpen(true)}>
-            <Menu color="white" />
+        <div className='chat-top flex justify-between items-center w-full'>
+          <div className="flex items-center gap-2">
+            <SidebarToggle className="text-white" />
+            <div className="btn2 btn desktop-only"><p>RyvonAI v1.0</p><img src="/img/down.svg" alt="" /></div>
           </div>
-
-          <div className="right-btncon desktop-only">
-            <div className="btn2 btn"><p>Configuration</p><img src="/img/setting.svg" alt="" /></div>
-            <div className="btn2 btn"><p>Export</p><img src="/img/export.svg" alt="" /></div>
+          
+          <div className="flex items-center gap-2">
+            <div className="right-btncon desktop-only">
+              <div className="btn2 btn"><p>Configuration</p><img src="/img/setting.svg" alt="" /></div>
+              <div className="btn2 btn"><p>Export</p><img src="/img/export.svg" alt="" /></div>
+            </div>
+            <div className="mobile-menu-btn" onClick={() => setIsMenuOpen(true)}>
+              <Menu color="white" />
+            </div>
           </div>
         </div>
 

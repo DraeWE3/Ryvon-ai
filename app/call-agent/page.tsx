@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import { SidebarToggle } from '@/components/sidebar-toggle';
 
 interface PhoneRegion {
   code: string;
@@ -395,9 +396,12 @@ export default function AICallAgent() {
         <div className="max-w-6xl w-full mx-auto">
           {/* Top Bar */}
           <div className="flex justify-between items-center mb-8 sm:mb-10 gap-4">
-            <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-black/30 backdrop-blur-xl border border-white/10 rounded-full text-sm font-medium text-white hover:border-[#1EA7FF] hover:shadow-[0_0_20px_rgba(30,167,255,0.3)] transition-all duration-250">
-              <span>RyvonAI v1.0</span>
-              <div className="w-3 h-3 border-r-2 border-b-2 border-gray-400 transform rotate-45 -mt-1"></div>
+            <div className="flex items-center gap-2">
+              <SidebarToggle className="text-white" />
+              <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 bg-black/30 backdrop-blur-xl border border-white/10 rounded-full text-sm font-medium text-white hover:border-[#1EA7FF] hover:shadow-[0_0_20px_rgba(30,167,255,0.3)] transition-all duration-250">
+                <span>RyvonAI v1.0</span>
+                <div className="w-3 h-3 border-r-2 border-b-2 border-gray-400 transform rotate-45 -mt-1"></div>
+              </div>
             </div>
             
             {/* Desktop Buttons */}

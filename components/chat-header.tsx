@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { memo } from "react";
-import { useWindowSize } from "usehooks-ts";
 import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, VercelIcon } from "./icons";
@@ -25,13 +24,12 @@ function PureChatHeader({
   const router = useRouter();
   const { open } = useSidebar();
 
-  const { width: windowWidth } = useWindowSize();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="chat-top">
       <div className="flex items-center gap-3">
-        {windowWidth < 768 && <SidebarToggle className="sidebar-toggle-external" />}
+        <SidebarToggle className="sidebar-toggle-external text-white" />
         <div className="btn2 btn cursor-pointer desktop-only">
           <p>RyvonAI v1.0</p>
           <img src="/img/down.svg" alt="" />
