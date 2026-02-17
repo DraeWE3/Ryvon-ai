@@ -849,8 +849,8 @@
 
 .intro-chat img{
    width: 8rem;
-   mix-blend-mode: screen;
-   filter: contrast(1.1) brightness(1.2);
+   mix-blend-mode: screen !important;
+   filter: contrast(1.1) brightness(1.2) !important;
 }
 
 .intro-chat h2{
