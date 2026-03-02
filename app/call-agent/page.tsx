@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { SidebarToggle } from '@/components/sidebar-toggle';
+import { toast } from '@/components/toast';
 
 interface PhoneRegion {
   code: string;
@@ -271,15 +272,27 @@ export default function AICallAgent() {
       setCallId(data.callId);
       setCallProgress(30);
       setCallStatus('in-call');
-
+ 
       pollCallStatus(data.callId);
     } catch (error) {
       console.error('Call error:', error);
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to start call');
-      setCallStatus('failed');
+      const message = error instanceof Error ? error.message : 'Failed to start call';
+      
+      if (message.includes('limit reached')) {
+        toast({
+          type: 'info',
+          description: message,
+        });
+        setCallStatus('idle');
+      } else {
+        setErrorMessage(message);
+        setCallStatus('failed');
+      }
+      
       setIsProcessing(false);
       setCallProgress(0);
     }
+
   };
 
   const pollCallStatus = (id: string) => {

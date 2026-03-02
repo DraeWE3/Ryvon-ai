@@ -130,8 +130,9 @@ export function Chat({
         ) {
           setShowCreditCardAlert(true);
         } else {
+          const isRateLimit = error.message?.toLowerCase().includes('limit') || error.message?.toLowerCase().includes('exceeded');
           toast({
-            type: "error",
+            type: isRateLimit ? "info" : "error",
             description: error.message,
           });
         }

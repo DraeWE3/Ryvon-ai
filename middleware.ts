@@ -6,10 +6,16 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const { nextUrl } = req;
-  const isOnPublicPage = nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/register");
+  const isOnPublicPage = nextUrl.pathname.startsWith("/login");
+  const isOnAdminPage = nextUrl.pathname.startsWith("/admin");
+  const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "draewe3@gmail.com";
 
   if (!isLoggedIn && !isOnPublicPage) {
     return Response.redirect(new URL("/login", nextUrl));
+  }
+
+  if (isOnAdminPage && req.auth?.user?.email !== ADMIN_EMAIL) {
+    return Response.redirect(new URL("/", nextUrl));
   }
 });
 

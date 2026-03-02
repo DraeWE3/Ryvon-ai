@@ -46,8 +46,7 @@ export default function Page() {
       });
     } else if (state.status === "success") {
       setIsSuccessful(true);
-      updateSession();
-      router.push("/");
+      window.location.href = "/welcome";
     }
   }, [state.status, router, updateSession]);
 
@@ -110,17 +109,8 @@ export default function Page() {
               Login
             </motion.h1>
             
-            <motion.div 
-              {...(isMounted ? {
-                initial: { y: 10, opacity: 0 },
-                animate: { y: 0, opacity: 1 },
-                transition: { delay: 0.4 }
-              } : {})}
-              className="toggle-container"
-            >
-              <Link href="/login" className="toggle-option active">Login</Link>
-              <Link href="/register" className="toggle-option">Sign up</Link>
-            </motion.div>
+            {/* Registration disabled - waitlist only */}
+            <div className="h-4" /> 
 
             <motion.form 
               {...(isMounted ? {

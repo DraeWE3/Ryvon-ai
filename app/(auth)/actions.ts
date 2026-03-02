@@ -25,11 +25,21 @@ export const login = async (
       password: formData.get("password"),
     });
 
-    await signIn("credentials", {
-      email: validatedData.email,
-      password: validatedData.password,
-      redirect: false,
-    });
+    try {
+      await signIn("credentials", {
+        email: validatedData.email,
+        password: validatedData.password,
+        redirect: true,
+        redirectTo: "/welcome",
+      });
+    } catch (error: any) {
+      // Auth.js uses a special Redirect error to handle redirection
+      // If the error message/type indicates a redirect, RE-THROW it so Next.js handles it
+      if (error.type === "NavigationRedirect" || error.message?.includes("NEXT_REDIRECT")) {
+        throw error;
+      }
+      return { status: "failed" };
+    }
 
     return { status: "success" };
   } catch (error) {

@@ -30,7 +30,9 @@ import {
   suggestion,
   type User,
   user,
+  waitlist,
   vote,
+  usage,
 } from "./schema";
 import { generateHashedPassword } from "./utils";
 
@@ -41,6 +43,37 @@ import { generateHashedPassword } from "./utils";
 // biome-ignore lint: Forbidden non-null assertion.
 const client = postgres(process.env.POSTGRES_URL!);
 const db = drizzle(client);
+
+export async function isEmailInWaitlist(email: string): Promise<boolean> {
+  try {
+    const result = await db
+      .select()
+      .from(waitlist)
+      .where(eq(waitlist.email, email));
+    return result.length > 0;
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to check waitlist"
+    );
+  }
+}
+
+export async function addToWaitlist(email: string) {
+  try {
+    return await db.insert(waitlist).values({ email }).onConflictDoNothing();
+  } catch (_error) {
+    throw new ChatSDKError("bad_request:database", "Failed to add to waitlist");
+  }
+}
+
+export async function getWaitlist() {
+  try {
+    return await db.select().from(waitlist);
+  } catch (_error) {
+    throw new ChatSDKError("bad_request:database", "Failed to get waitlist");
+  }
+}
 
 export async function getUser(email: string): Promise<User[]> {
   try {
@@ -57,7 +90,11 @@ export async function createUser(email: string, password: string) {
   const hashedPassword = generateHashedPassword(password);
 
   try {
-    return await db.insert(user).values({ email, password: hashedPassword });
+    const [newUser] = await db
+      .insert(user)
+      .values({ email, password: hashedPassword })
+      .returning();
+    return newUser;
   } catch (_error) {
     throw new ChatSDKError("bad_request:database", "Failed to create user");
   }
@@ -555,6 +592,55 @@ export async function getMessageCountByUserId({
   }
 }
 
+export async function getUsageCountByUserId({
+  id,
+  type,
+  differenceInHours,
+}: {
+  id: string;
+  type: "tts" | "call";
+  differenceInHours: number;
+}) {
+  try {
+    const timeframe = new Date(Date.now() - differenceInHours * 60 * 60 * 1000);
+ 
+    const [stats] = await db
+      .select({ count: count(usage.id) })
+      .from(usage)
+      .where(
+        and(
+          eq(usage.userId, id),
+          eq(usage.type, type),
+          gte(usage.createdAt, timeframe)
+        )
+      )
+      .execute();
+ 
+    return stats?.count ?? 0;
+  } catch (_error) {
+    throw new ChatSDKError(
+      "bad_request:database",
+      "Failed to get usage count"
+    );
+  }
+}
+ 
+export async function saveUsage({
+  userId,
+  type,
+}: {
+  userId: string;
+  type: "tts" | "call";
+}) {
+  try {
+    return await db
+      .insert(usage)
+      .values({ userId, type, createdAt: new Date() });
+  } catch (_error) {
+    throw new ChatSDKError("bad_request:database", "Failed to save usage");
+  }
+}
+ 
 export async function createStreamId({
   streamId,
   chatId,

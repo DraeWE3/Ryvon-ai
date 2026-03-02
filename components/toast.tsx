@@ -3,44 +3,45 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { toast as sonnerToast } from "sonner";
 import { cn } from "@/lib/utils";
-import { CheckCircleFillIcon, WarningIcon } from "./icons";
-
-const iconsByType: Record<"success" | "error", ReactNode> = {
+import { CheckCircleFillIcon, WarningIcon, InfoIcon } from "./icons";
+ 
+const iconsByType: Record<"success" | "error" | "info", ReactNode> = {
   success: <CheckCircleFillIcon />,
   error: <WarningIcon />,
+  info: <InfoIcon />,
 };
-
+ 
 export function toast(props: Omit<ToastProps, "id">) {
   return sonnerToast.custom((id) => (
     <Toast description={props.description} id={id} type={props.type} />
   ));
 }
-
+ 
 function Toast(props: ToastProps) {
   const { id, type, description } = props;
-
+ 
   const descriptionRef = useRef<HTMLDivElement>(null);
   const [multiLine, setMultiLine] = useState(false);
-
+ 
   useEffect(() => {
     const el = descriptionRef.current;
     if (!el) {
       return;
     }
-
+ 
     const update = () => {
       const lineHeight = Number.parseFloat(getComputedStyle(el).lineHeight);
       const lines = Math.round(el.scrollHeight / lineHeight);
       setMultiLine(lines > 1);
     };
-
+ 
     update(); // initial check
     const ro = new ResizeObserver(update); // re-check on width changes
     ro.observe(el);
-
+ 
     return () => ro.disconnect();
   }, []);
-
+ 
   return (
     <div className="flex toast-mobile:w-[356px] w-full justify-center">
       <div
@@ -53,7 +54,7 @@ function Toast(props: ToastProps) {
       >
         <div
           className={cn(
-            "data-[type=error]:text-red-600 data-[type=success]:text-green-600",
+            "data-[type=error]:text-red-600 data-[type=success]:text-green-600 data-[type=info]:text-blue-600",
             { "pt-1": multiLine }
           )}
           data-type={type}
@@ -67,9 +68,10 @@ function Toast(props: ToastProps) {
     </div>
   );
 }
-
+ 
 type ToastProps = {
   id: string | number;
-  type: "success" | "error";
+  type: "success" | "error" | "info";
   description: string;
 };
+

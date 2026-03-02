@@ -12,10 +12,19 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnPublicPage = nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/register");
+      const isAdmin = auth?.user?.email === (process.env.ADMIN_EMAIL || "draewe3@gmail.com");
+      const isOnPublicPage = nextUrl.pathname.startsWith("/login");
+      const isOnAdminPage = nextUrl.pathname.startsWith("/admin");
 
-      if (isOnPublicPage) {
-        if (isLoggedIn) return Response.redirect(new URL("/", nextUrl));
+      // Redirect logged-in users away from /login to /welcome (or chat)
+      if (isOnPublicPage && isLoggedIn) {
+        return Response.redirect(new URL("/welcome", nextUrl));
+      }
+
+      // Restrict admin pages
+      if (isOnAdminPage) {
+        if (!isLoggedIn) return false; // Force sign in
+        if (!isAdmin) return Response.redirect(new URL("/", nextUrl)); // Redirect non-admins to home
         return true;
       }
 

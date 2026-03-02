@@ -14,6 +14,7 @@ import playBtnBg from '../../artifacts/image/play-btn-bg.png';
 import downloadBg from '../../artifacts/image/download-bg.png';
 import downloadIcon from '../../artifacts/image/download-icon.svg';
 import { Play, Pause, Menu, X } from 'lucide-react';
+import { toast } from '@/components/toast';
 import { SidebarToggle } from '@/components/sidebar-toggle';
 
 export default function TextToSpeechPage() {
@@ -170,29 +171,31 @@ export default function TextToSpeechPage() {
     }
 
     try {
-      const response = await fetch(
-        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Accept': 'audio/mpeg',
-            'Content-Type': 'application/json',
-            'xi-api-key': apiKey
-          },
-          body: JSON.stringify({
-            text: text,
-            model_id: 'eleven_turbo_v2_5',
-            voice_settings: {
-              stability: stability,
-              similarity_boost: similarity,
-              style: styleExaggeration,
-              use_speaker_boost: speakerBoost
-            }
-          })
-        }
-      );
+      console.log('TTS Page: Sending request to /api/tts');
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          text: text,
+          voiceId: voiceId,
+          voice_settings: {
+            stability: stability,
+            similarity_boost: similarity,
+            style: styleExaggeration,
+            use_speaker_boost: speakerBoost
+          }
+        })
+      });
 
-      if (!response.ok) throw new Error('Failed to generate speech');
+      console.log('TTS Page: Response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to generate speech');
+      }
 
       const audioBlob = await response.blob();
       const url = URL.createObjectURL(audioBlob);
@@ -222,12 +225,22 @@ export default function TextToSpeechPage() {
       
       newAudio.play();
       setIsPlaying(true);
-    } catch (err) {
-      setError('Failed to generate speech');
+    } catch (err: any) {
+      console.error('TTS Page: Error:', err);
+      const message = err.message || 'Failed to generate speech';
+      if (message.includes('limit reached')) {
+        toast({
+          type: 'info',
+          description: message,
+        });
+      } else {
+        setError(message);
+      }
     } finally {
       setIsGenerating(false);
     }
   };
+
 
   const togglePlayPause = () => {
     if (!audio) return;

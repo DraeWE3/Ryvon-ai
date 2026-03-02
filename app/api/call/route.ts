@@ -1,8 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
-
+import { auth } from '@/app/(auth)/auth';
+import { getUsageCountByUserId, saveUsage } from '@/lib/db/queries';
+import { entitlementsByUserType } from '@/lib/ai/entitlements';
+ 
 // POST endpoint - Initiate call
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+ 
+    const userType = session.user.type;
+    const usageCount = await getUsageCountByUserId({
+      id: session.user.id,
+      type: 'call',
+      differenceInHours: 24,
+    });
+ 
+    if (usageCount >= entitlementsByUserType[userType].maxCallsPerDay) {
+      return NextResponse.json(
+        { success: false, error: 'Call limit reached. Please try again later.' },
+        { status: 429 }
+      );
+    }
+ 
     const { phoneNumber, assistantId } = await request.json();
 
     if (!phoneNumber) {
@@ -85,7 +110,9 @@ export async function POST(request: NextRequest) {
       status: data.status,
       phoneNumber: phoneNumber
     });
-
+ 
+    await saveUsage({ userId: session.user.id, type: 'call' });
+ 
     return NextResponse.json({
       success: true,
       callId: data.id,

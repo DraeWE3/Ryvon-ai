@@ -171,3 +171,20 @@ export const stream = pgTable(
 );
 
 export type Stream = InferSelectModel<typeof stream>;
+export const waitlist = pgTable("Waitlist", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  email: varchar("email", { length: 64 }).notNull().unique(),
+});
+
+export type Waitlist = InferSelectModel<typeof waitlist>;
+ 
+export const usage = pgTable("Usage", {
+  id: uuid("id").primaryKey().notNull().defaultRandom(),
+  userId: uuid("userId")
+    .notNull()
+    .references(() => user.id),
+  type: varchar("type", { enum: ["tts", "call"] }).notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+});
+ 
+export type Usage = InferSelectModel<typeof usage>;
